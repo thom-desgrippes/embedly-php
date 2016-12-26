@@ -33,7 +33,7 @@ class Embedly {
      * @const
      */
     const TIMEOUTS = array(
-          'connect' => DEFAULT_CONNECT_TIMEOUT
+          'timeout' => DEFAULT_CONNECT_TIMEOUT
         , 'connect_timeout' => DEFAULT_TIMEOUT
     );
 
@@ -320,7 +320,7 @@ class Embedly {
             $this->setCurlOptions($ch, array(
                 sprintf('Host: %s', $url['hostname']),
                 sprintf('User-Agent: %s', $this->user_agent)
-            ));
+            ), self::TIMEOUTS);
             $response_arr = $this->curlExec($ch);
             $res = $response_arr["response"];
             $this->services = json_decode($res);
