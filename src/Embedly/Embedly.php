@@ -17,6 +17,28 @@ class Embedly {
 
     /**
      *
+     * @const
+     */
+    const DEFAULT_CONNECT_TIMEOUT = 25;
+
+    /**
+     *
+     * @const
+     */
+    const DEFAULT_TIMEOUT = 30;
+
+
+    /**
+     *
+     * @const
+     */
+    const TIMEOUTS = array(
+          'connect' => DEFAULT_CONNECT_TIMEOUT
+        , 'connect_timeout' => DEFAULT_TIMEOUT
+    );
+
+    /**
+     *
      * @var string
      */
     protected $hostname = 'api.embed.ly';
@@ -188,6 +210,7 @@ class Embedly {
     {
         $justone = is_string($params);
         $params  = self::paramify($params);
+        $timeouts = array_merge(self::TIMEOUTS, array_intersect_key($params, self::TIMEOUTS));
 
         if (!array_key_exists('urls', $params)) {
             $params['urls'] = array();
@@ -238,7 +261,7 @@ class Embedly {
             $this->setCurlOptions($ch, array(
                 sprintf('Host: %s', $url_parts['hostname']),
                 sprintf('User-Agent: %s', $this->user_agent)
-            ));
+            ), $timeouts);
             $response_arr = $this->curlExec($ch);
             $http_code = $response_arr["http_code"];
             $res = $response_arr["response"];
@@ -330,14 +353,14 @@ class Embedly {
      * @param array $headers
      * @return void
      */
-    protected function setCurlOptions(&$ch, $headers = array())
+    protected function setCurlOptions(&$ch, $headers = array(), $timeouts = array())
     {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_BUFFERSIZE, 4096);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 25);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeouts["connect_timeout"]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeouts["timeout"]);
     }
 
     /**
